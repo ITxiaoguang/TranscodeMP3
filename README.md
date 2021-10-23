@@ -55,5 +55,5 @@ dialog.show();
 ```
 
 
-支持更多ffmpeg命令转码，请看：[RxFFmpeg](https://github.com/microshow/RxFFmpeg)
+更多ffmpeg命令转码，请看：[RxFFmpeg](https://github.com/microshow/RxFFmpeg)
 

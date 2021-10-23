@@ -1,12 +1,12 @@
 # TranscodeMP3
-一款好用的转码成MP3格式的工具。
+一款好用的音频转码成MP3格式的工具。
 
 用FFmpeg实现转码。
 
 支持音频格式转换成mp3格式的工具（m3u8除外）。
 
 
-自带TranscodeMp3Dialog弹窗，用法：
+自带TranscodeMp3Dialog弹窗，用法超级简单：
 
 ```java
 String inputFilePath = "输入你需要转码的音频地址";

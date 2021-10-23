@@ -1,10 +1,34 @@
 # TranscodeMP3
-一款好用的音频转码成MP3格式的工具。
+# 一款好用的音频转码成MP3格式的工具。
+[![](https://www.jitpack.io/v/ITxiaoguang/TranscodeMP3.svg)](https://www.jitpack.io/#ITxiaoguang/TranscodeMP3)
 
-用FFmpeg实现转码。
+### 用FFmpeg实现转码。
 
-支持音频格式转换成mp3格式的工具（m3u8除外）。
+### 支持音频格式转换成mp3格式的工具（m3u8除外）。
 
+## 如何添加
+### Gradle添加：
+#### 1.在Project的`build.gradle`中添加仓库地址
+
+``` gradle
+allprojects {
+  repositories {
+     ...
+     maven { url "https://jitpack.io" }
+  }
+}
+```
+
+#### 2.在Module目录下的`build.gradle`中添加依赖
+
+
+[![](https://www.jitpack.io/v/ITxiaoguang/TranscodeMP3.svg)](https://www.jitpack.io/#ITxiaoguang/TranscodeMP3)
+
+``` gradle
+dependencies {
+       implementation 'com.github.ITxiaoguang:TranscodeMP3:xxx'
+}
+```
 
 自带TranscodeMp3Dialog弹窗，用法超级简单：
 

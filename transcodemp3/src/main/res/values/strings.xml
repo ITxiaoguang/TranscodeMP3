@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">TranscodeMP3</string>
+
+    <string name="transcoding">转码中...</string>
+    <string name="cancel">取消</string>
+    <string name="cant_m3u8">m3u8为视频格式,不支持转码,请重新选择</string>
+    <string name="canceled">已取消</string>
+    <string name="transcode_cancel">取消转码。</string>
+    <string name="transcode_error">转码失败了。</string>
+    <string name="handle_error">出错了 onError：</string>
+    <string name="handle_success">处理成功</string>
+</resources>

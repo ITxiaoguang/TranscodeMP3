@@ -6,30 +6,8 @@
 
 ### 支持音频格式转换成mp3格式的工具（m3u8除外）。
 
+### 自带`TranscodeMp3Dialog`弹窗，用法超级简单。
 
-### 自带TranscodeMp3Dialog弹窗，用法超级简单：
-
-```java
-String inputFilePath = "输入你需要转码的音频地址";
-String[] ignores = {"mp3"};// mp3 不转码
-TranscodeMp3Dialog dialog = new TranscodeMp3Dialog(this);
-dialog.setInputPath(inputFilePath);// 输入的文件地址
-dialog.setIgnores(ignores);// 忽略的格式
-dialog.setCallback(new TranscodeMp3Dialog.OnCallback() {
-    // 转码成功  successPath：转码成功后地址
-    @Override
-    public void success(String successPath) {
-        Toast.makeText(MainActivity.this, "成功，path： " + successPath, Toast.LENGTH_SHORT).show();
-    }
-
-    // 转码失败  code：失败代码 message：失败描述
-    @Override
-    public void fail(int code, String message) {
-        Toast.makeText(MainActivity.this, "失败，message： " + message, Toast.LENGTH_SHORT).show();
-    }
-});
-dialog.show();
-```
 
 ## 如何添加
 ### Gradle添加：
@@ -55,7 +33,7 @@ dependencies {
 }
 ```
 
-自带TranscodeMp3Dialog弹窗，用法超级简单：
+自带`TranscodeMp3Dialog`弹窗，用法超级简单：
 
 ```java
 String inputFilePath = "输入你需要转码的音频地址";
@@ -129,7 +107,7 @@ public void onActivityResult(int requestCode, int resultCode, Intent data) {
             ArrayList<String> filePaths = data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_DOCS);
             String path = filePaths.get(0);
 //                Toast.makeText(this, "地址： " + path, Toast.LENGTH_SHORT).show();
-            compress(path);
+            // doto 得到文件地址，进行转码
         }
     }
 }

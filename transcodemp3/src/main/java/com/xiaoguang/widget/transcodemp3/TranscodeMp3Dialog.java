@@ -2,15 +2,11 @@ package com.xiaoguang.widget.transcodemp3;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.util.DisplayMetrics;
+import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -43,22 +39,20 @@ public class TranscodeMp3Dialog extends Dialog {
 
     private MyRxFFmpegSubscriber myRxFFmpegSubscriber;
     private String inputPath;
-    private String[] ignores;
     private String outputPath;
+    private String[] ignores;
 
     public TranscodeMp3Dialog(@NonNull Context context) {
         super(context, R.style.dialog_default_style);
         this.context = context;
-        String directory = Environment.getExternalStorageDirectory().getPath() + "/Android/data/" + context.getPackageName() + "/cache/transcode_mp3";
-        File file = new File(directory);
-        if (!file.exists()) {
-            file.mkdir();
-        }
-        this.outputPath = directory + "/outputMp3.mp3";
     }
 
     public void setInputPath(String inputPath) {
         this.inputPath = inputPath;
+    }
+
+    public void setOutputPath(String outputPath) {
+        this.outputPath = outputPath;
     }
 
     public void setIgnores(String[] ignores) {
@@ -81,23 +75,31 @@ public class TranscodeMp3Dialog extends Dialog {
         tv_des.setText(R.string.transcoding);
 
         setCanceledOnTouchOutside(false);
+        getWindow().setBackgroundDrawableResource(R.color.transparent);
 
-        // set window params
-        Window window = getWindow();
-        window.setBackgroundDrawableResource(R.color.transparent);
-        WindowManager.LayoutParams params = window.getAttributes();
-        int density = getWidthPixels(context);
-        params.width = density - 40;
-        params.gravity = Gravity.CENTER;
-        window.setAttributes(params);
+        initOutputPath();
 
         runFFmpegRxJava();
     }
 
-    private int getWidthPixels(Context context) {
-        Resources resources = context.getResources();
-        DisplayMetrics dm = resources.getDisplayMetrics();
-        return dm.widthPixels;
+    /**
+     * 默认输出路径  包名/cache/transcodeMp3/outputMp3.mp3
+     */
+    private void initOutputPath() {
+        if (TextUtils.isEmpty(outputPath)) {
+            String path = Environment.getExternalStorageDirectory().getPath() + "/Android/data/" + context.getPackageName();
+            mkdir(path);
+            mkdir(path + "/cache");
+            mkdir(path + "/cache/transcodeMp3");
+            outputPath = path + "/cache/transcodeMp3" + "/outputMp3.mp3";
+        }
+    }
+
+    public static void mkdir(String filePath) {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            file.mkdir();
+        }
     }
 
     @Override
@@ -186,7 +188,7 @@ public class TranscodeMp3Dialog extends Dialog {
     }
 
     private void progressDialog(int code, String s) {
-        Log.e("Mp3Converter   ", s);
+        Log.e("TranscodeMp3Dialog   ", s);
         if (code == 1) {
             callback.success(outputPath);
             dismiss();
@@ -201,7 +203,7 @@ public class TranscodeMp3Dialog extends Dialog {
 
     private void setProgressDialog(int progress, long progressTime) {
         tv_progress.setText(progress + "%");
-        Log.e("Mp3Converter   ", "progress:" + progress + "   progressTime:" + progressTime);
+        Log.e("TranscodeMp3Dialog   ", "progress:" + progress + "   progressTime:" + progressTime);
     }
 
     // 获取文件扩展名
@@ -215,169 +217,4 @@ public class TranscodeMp3Dialog extends Dialog {
         return "";
     }
 
-//    private void runFFmpegRxJava() {
-//        String ffmpeg = "ffmpeg -y -i %s -preset superfast %s";
-//        String content = String.format(ffmpeg, inputPath, wavPath);
-//
-//        String[] commands = content.split(" ");
-//
-//        myRxFFmpegSubscriber = new Mp3ConverterDialog.MyRxFFmpegSubscriber(this);
-//
-//        //开始执行FFmpeg命令
-//        RxFFmpegInvoke.getInstance()
-//                .runCommandRxJava(commands)
-//                .subscribe(myRxFFmpegSubscriber);
-//    }
-//
-//    public static class MyRxFFmpegSubscriber extends RxFFmpegSubscriber {
-//
-//        private WeakReference<Mp3ConverterDialog> mWeakReference;
-//
-//        public MyRxFFmpegSubscriber(Mp3ConverterDialog Mp3Converter) {
-//            mWeakReference = new WeakReference<>(Mp3Converter);
-//        }
-//
-//        @Override
-//        public void onFinish() {
-//            final Mp3ConverterDialog mHomeFragment = mWeakReference.get();
-//            if (mHomeFragment != null) {
-//                mHomeFragment.progressDialog(1, "处理成功");
-//            }
-//        }
-//
-//        @Override
-//        public void onProgress(int progress, long progressTime) {
-//            final Mp3ConverterDialog mHomeFragment = mWeakReference.get();
-//            if (mHomeFragment != null) {
-//                //progressTime 可以在结合视频总时长去计算合适的进度值
-//                mHomeFragment.setProgressDialog(progress, progressTime);
-//            }
-//        }
-//
-//        @Override
-//        public void onCancel() {
-//            final Mp3ConverterDialog mHomeFragment = mWeakReference.get();
-//            if (mHomeFragment != null) {
-//                mHomeFragment.progressDialog(0, "已取消");
-//            }
-//        }
-//
-//        @Override
-//        public void onError(String message) {
-//            final Mp3ConverterDialog mHomeFragment = mWeakReference.get();
-//            if (mHomeFragment != null) {
-//                mHomeFragment.progressDialog(-1, "出错了 onError：" + message);
-//            }
-//        }
-//    }
-//
-//
-//    @Override
-//    public void onDetachedFromWindow() {
-//        super.onDetachedFromWindow();
-//        if (myRxFFmpegSubscriber != null) {
-//            myRxFFmpegSubscriber.dispose();
-//        }
-//        if (handler != null) {
-//            handler.removeCallbacksAndMessages(null);
-//        }
-//    }
-//
-//    private void progressDialog(int code, String s) {
-//        Log.e("Mp3Converter   ", s);
-//        if (code == 1) {
-//            if (doing) {
-//                tv_des.setText("转码中...");
-//                initLame();
-//            } else {
-//                callback.success(outputPath);
-//                dismiss();
-//                Log.e("Mp3Converter   ", "转码完成");
-//            }
-//        } else if (code == -1) {
-//            ToastHelper.showToast(BaseApp.getContext(), "转码失败了。");
-//            dismiss();
-//        } else {
-//            ToastHelper.showToast(BaseApp.getContext(), "取消转码。");
-//        }
-//    }
-//
-//    private void initLame() {
-//        MediaExtractor mex = new MediaExtractor();
-//        try {
-//            mex.setDataSource(inputPath);// the adresss location of the sound on sdcard.
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        MediaFormat mf = mex.getTrackFormat(0);
-//        int bitRate = mf.getInteger(MediaFormat.KEY_BIT_RATE) / 1000;//148    mode = 0  29:30   mode = 1  24:06  mode = 2  29:30
-//        int sampleRate = mf.getInteger(MediaFormat.KEY_SAMPLE_RATE);//48000
-//        int channelCount = mf.getInteger(MediaFormat.KEY_CHANNEL_COUNT);//2
-//
-//        Mp3Converter.init(sampleRate, channelCount, 0, sampleRate, bitRate, 7);
-//        fileSize = new File(wavPath).length();
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                Mp3Converter.convertMp3(wavPath, outputTempPath);
-//            }
-//        }).start();
-//
-//        handler.postDelayed(runnable, 500);
-//    }
-//
-//    private long fileSize;
-//    Handler handler = new Handler();
-//    Runnable runnable = new Runnable() {
-//        @Override
-//        public void run() {
-//            long bytes = Mp3Converter.getConvertBytes();
-//            int progress = (int) (100f * bytes / fileSize);
-//            if (bytes == -1) {
-//                progress = 100;
-//            }
-//            Log.e("Mp3Converter", "convert progress: " + progress);
-//
-//            if (handler != null && progress < 100) {
-//                tv_progress.setText(progress + "%");
-//                handler.postDelayed(this, 1000);
-//            } else if (100 == progress) {
-//                cut();
-//            }
-//        }
-//    };
-//
-//    /**
-//     * 裁剪
-//     */
-//    private void cut() {
-//        tv_des.setText("优化中...");
-//        doing = false;
-//        float duration = 0F;
-//        try {
-//            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-//            mmr.setDataSource(inputPath);
-//            duration = Float.parseFloat(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) / 1000;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        String ffmpeg1 = "ffmpeg -y -i %s -vn -acodec copy -ss 0 -t %f %s";
-//        String content = String.format(ffmpeg1, outputTempPath, duration, outputPath);
-//
-//        String[] commands = content.split(" ");
-//
-//        myRxFFmpegSubscriber = new Mp3ConverterDialog.MyRxFFmpegSubscriber(this);
-//
-//        //开始执行FFmpeg命令
-//        RxFFmpegInvoke.getInstance()
-//                .runCommandRxJava(commands)
-//                .subscribe(myRxFFmpegSubscriber);
-//    }
-//
-//    private void setProgressDialog(int progress, long progressTime) {
-//        tv_progress.setText(progress + "%");
-//        Log.e("Mp3Converter   ", "progress:" + progress + "   progressTime:" + progressTime);
-//    }
 }

@@ -4,7 +4,8 @@
 
 ### 用FFmpeg实现转码。
 
-### 支持音频格式转换成mp3格式的工具（m3u8除外）。
+### 支持音频格式转换成mp3格式的工具。
+### 支持自定义输出路径。
 
 ### 自带`TranscodeMp3Dialog`弹窗，用法超级简单。
 
@@ -33,22 +34,39 @@ dependencies {
 }
 ```
 
+#### 3.Android10.0 需要在`AndroidManifest.xml`文件中`application`出加上
+```xml
+<application
+  android:requestLegacyExternalStorage="true"
+  ...
+  />
+```
+
+#### 4.`AndroidManifest.xml`加上读写权限，代码里并请求读写权限
+```xml
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```
+
 自带`TranscodeMp3Dialog`弹窗，用法超级简单：
 
 ```java
-String inputFilePath = "输入你需要转码的音频地址";
-String[] ignores = {"mp3"};// mp3 不转码
+// String inputPath = "输入你需要转码的音频地址";
+// String cameraPath = Environment.getExternalStorageDirectory().getPath() + "/transcodeMp3/";
+// TranscodeMp3Dialog.mkdir(cameraPath);
+// String outputPath = cameraPath + System.currentTimeMillis() + ".mp3";
+
+String[] ignores = {"mp3"};//mp3 不转码
 TranscodeMp3Dialog dialog = new TranscodeMp3Dialog(this);
-dialog.setInputPath(inputFilePath);// 输入的文件地址
-dialog.setIgnores(ignores);// 忽略的格式
+dialog.setInputPath(inputPath);
+// dialog.setOutputPath(outputPath);// 你想导出的地址 默认输出路径：包名/cache/transcodeMp3/outputMp3.mp3
+dialog.setIgnores(ignores);
 dialog.setCallback(new TranscodeMp3Dialog.OnCallback() {
-    // 转码成功  successPath：转码成功后地址
     @Override
     public void success(String successPath) {
         Toast.makeText(MainActivity.this, "成功，path： " + successPath, Toast.LENGTH_SHORT).show();
     }
-
-    // 转码失败  code：失败代码 message：失败描述
+    
     @Override
     public void fail(int code, String message) {
         Toast.makeText(MainActivity.this, "失败，message： " + message, Toast.LENGTH_SHORT).show();
